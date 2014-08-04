@@ -24,10 +24,6 @@ class AccountController extends BaseController {
 
     public function getEditSettings($id)
     {
-        if ($this->ensureSelf($id) === false) {
-            return Redirect::route('account');
-        }
-
         $user = $this->userService
             ->retrieveUserById($id);
 
@@ -41,10 +37,6 @@ class AccountController extends BaseController {
 
     public function getEditPassword($id)
     {
-        if ($this->ensureSelf($id) === false) {
-            return Redirect::route('account');
-        }
-
         $user = $this->userService
             ->retrieveUserById($id);
 
@@ -56,17 +48,18 @@ class AccountController extends BaseController {
             ->with('formData', $formData);
     }
 
-    // public function getEditByName($name)
-    // {
-    //     $user = $this->userService
-    //         ->retrieveUserByName($name);
+    public function getEditSocial($id)
+    {
+        $user = $this->userService
+            ->retrieveUserById($id);
 
-    //     if (count($user) === 0) {
-    //         return Redirect::route('account.edit.byId', Auth::user()->name);
-    //     }
+        $formData = $this->accountService
+            ->formData($user);
 
-    //     return $this->getEditById($user->id);
-    // }
+        return View::make('account::edit-social')
+            ->with('user',     $user)
+            ->with('formData', $formData);
+    }
 
     public function postSave()
     {
@@ -78,15 +71,9 @@ class AccountController extends BaseController {
         $user = $this->accountService
             ->prepareSave($user, $values);
 
-        // echo '<pre>';
-        // dd($user);
         $user->save();
+        $user->push();
 
         return Redirect::route('account');
-    }
-
-    private function ensureSelf($id)
-    {
-        return $id == Auth::user()->id;
     }
 }
